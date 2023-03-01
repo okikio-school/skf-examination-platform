@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: workers
+data:
+  # Always use HTTPS in the below ENV
+  KUBERNETES_HOST: kubernetes
+  SKF_LABS_DOMAIN: http://localhost
+  SKF_LABS_DEPLOY_MODE: port
+  KUBECONFIG: /root/.kube/config
+---  
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: astro
+data:
+  # Always use HTTPS in the below ENV
+  PUBLIC_SUPABASE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjc2dmb29hbmtja2ZxcG1jZnliIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjkwNTYzNDcsImV4cCI6MTk4NDYzMjM0N30.aicU94g4B2IThg69VEhScf37hqJTzOc-FXMvTEX-br4
+---  
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq
+data:
+  RABBIT_MQ_CONN_STRING: rabbitmq
+  RABBITMQ_DEFAULT_USER: guest
+  RABBITMQ_DEFAULT_PASS: guest

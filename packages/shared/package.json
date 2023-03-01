@@ -1,0 +1,16 @@
+{
+  "name": "@skf/shared",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "rascal": "^16.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.13.0",
+    "@types/rascal": "^10.0.6"
+  }
+}

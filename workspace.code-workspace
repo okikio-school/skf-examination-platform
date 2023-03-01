@@ -1,0 +1,32 @@
+{
+  "folders": [
+    {
+      "name": "✨ root",
+      "path": "."
+    },
+    {
+      "name": "📦 @skf/astro",
+      "path": "packages/astro"
+    },
+    {
+      "name": "📦 @skf/shared",
+      "path": "packages/shared"
+    },
+    {
+      "name": "📦 @skf/workers",
+      "path": "packages/workers"
+    }
+  ],
+  "settings": {
+    "deno.enablePaths": [
+      "./packages/workers"
+    ],
+    "deno.config": "./packages/workers/deno.jsonc",
+    "yaml.schemas": {
+      "Kubernetes": [
+        "deploy*.yaml"
+      ],
+    },
+    "git.ignoreLimitWarning": true,
+  }
+}

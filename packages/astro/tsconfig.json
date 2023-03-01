@@ -1,0 +1,21 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "svelte",
+    "types": ["unplugin-icons/types/svelte"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "src/*": ["src/*"],
+      "db/*": ["src/db/*"],
+      "workers/*": ["src/workers/*"],
+      "layouts/*": ["src/layouts/*"],
+      "pages/*": ["src/pages/*"],
+      "utils/*": ["src/utils/*"],
+      "data/*": ["src/data/*"],
+      "stores/*": ["src/stores/*"],
+      "components/*": ["src/components/*"]
+    }
+  }
+}

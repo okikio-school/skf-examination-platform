@@ -4,6 +4,7 @@ import {
   createServerSupabaseClient as _createServerSupabaseClient,
 } from "@supabase/auth-helpers-shared";
 import type { AstroGlobal, APIContext } from "astro";
+import type { Database } from "./database.types";
 
 const supabaseKey = (await getApiKey()) || "";
 
@@ -20,7 +21,7 @@ function createServerSupabaseClient(
     cookieOptions?: CookieOptions;
   } = {}
 ) {
-  return _createServerSupabaseClient({
+  return _createServerSupabaseClient<Database>({
     supabaseUrl,
     supabaseKey,
     getCookie(name) {

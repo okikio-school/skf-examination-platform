@@ -1,58 +1,27 @@
 {
-  "name": "skf-dashboard",
+  "name": "root",
   "type": "module",
   "version": "0.0.1",
   "private": true,
   "engines": {
     "node": ">=18.0.0"
   },
+  "workspaces": [
+    "packages"
+  ],
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro",
-    "check:ts": "tsc --noEmit",
-    "format": "prettier --write .",
-    "check:format": "prettier --check .",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.svelte,.astro",
-    "generate:json": "tsx ./src/scripts/fetchLabs.ts",
-    "start:server": "node ./dist/server/entry.mjs"
-  },
-  "dependencies": {
-    "@astrojs/svelte": "^2.0.1",
-    "@astrojs/vercel": "^3.1.1",
-    "@codemirror/lang-javascript": "^6.1.3",
-    "@codemirror/state": "^6.2.0",
-    "@codemirror/theme-one-dark": "^6.1.0",
-    "@codemirror/view": "^6.8.1",
-    "@fontsource/electrolize": "^4.5.8",
-    "@fontsource/lexend-deca": "^4.5.14",
-    "@fontsource/manrope": "^4.5.13",
-    "@supabase/auth-helpers-shared": "^0.2.4",
-    "@supabase/supabase-js": "^2.7.1",
-    "astro": "^2.0.10",
-    "chart.js": "^4.2.1",
-    "codemirror": "^6.0.1",
-    "marked": "^4.2.12",
-    "nanoid": "^4.0.1",
-    "svelte": "^3.55.1"
+    "dev": "docker compose up --remove-orphans",
+    "start": "sh ./scripts/kubernetes-sh.sh",
+    "start:workers": "pnpm --filter=workers exec -- deno task kubernetes",
+    "start:astro": "pnpm --filter=astro start:server",
+    "build:astro": "pnpm --filter=astro build",
+    "dev:astro": "pnpm --filter=astro dev",
+    "docker": "pnpm docker:astro && pnpm docker:workers; kind load docker-image workers:skf astro:skf",
+    "docker:workers": "docker build -t workers:skf -f ./packages/workers/Dockerfile --target prod . --no-cache",
+    "docker:astro": "docker build -t astro:skf -f ./packages/astro/Dockerfile --target dev . --no-cache",
+    "kind:create": "sh ./scripts/cluster-create-sh.sh"
   },
   "devDependencies": {
-    "@iconify-json/fluent": "^1.1.17",
-    "@iconify-json/fluent-emoji": "^1.1.10",
-    "@types/marked": "^4.0.8",
-    "@types/node": "^18.13.0",
-    "@typescript-eslint/eslint-plugin": "^5.51.0",
-    "@typescript-eslint/parser": "^5.51.0",
-    "dotenv": "^16.0.3",
-    "eslint": "^8.33.0",
-    "eslint-plugin-astro": "^0.23.0",
-    "eslint-plugin-svelte3": "^4.0.0",
-    "prettier": "^2.8.4",
-    "prettier-plugin-astro": "^0.8.0",
-    "prettier-plugin-svelte": "^2.9.0",
-    "tsx": "^3.12.3",
-    "unplugin-icons": "^0.15.2"
+    "typescript": "^4.9.5"
   }
 }

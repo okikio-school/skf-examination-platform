@@ -1,0 +1,73 @@
+# Run docker-compose up
+# Live long and prosper
+version: "2"
+services:
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:management
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    labels:
+      kompose.service.type: nodeport
+      kompose.image-pull-policy: IfNotPresent
+
+  astro:
+    container_name: astro
+    image: astro:skf
+    build: 
+      context: .
+      dockerfile: ./packages/astro
+      target: prod
+    depends_on:
+      - "rabbitmq"
+    restart: always
+    volumes:
+      - ./:/app
+    ports:
+      - "3000:3000"
+    environment:
+      - SKF_LABS_DOMAIN=http://localhost
+      - SKF_LABS_DEPLOY_MODE=port
+      - PUBLIC_SUPABASE_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjc2dmb29hbmtja2ZxcG1jZnliIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjkwNTYzNDcsImV4cCI6MTk4NDYzMjM0N30.aicU94g4B2IThg69VEhScf37hqJTzOc-FXMvTEX-br4
+    labels:
+      kompose.service.type: nodeport
+      kompose.service.nodeport.port: 30000
+      kompose.image-pull-policy: Always
+
+  workers:
+    container_name: workers
+    image: workers:skf
+    build: 
+      context: .
+      dockerfile: ./packages/workers
+      target: prod
+    depends_on:
+      - "rabbitmq"
+    restart: always
+    volumes:
+      - ./:/app
+    environment:
+      - SKF_LABS_DOMAIN=http://localhost
+      - SKF_LABS_DEPLOY_MODE=port
+    command:
+      - cd packages/workers
+      - deno task kubernetes
+    labels:
+      kompose.image-pull-policy: Always
+
+  nginx:
+    container_name: nginx
+    image: nginx
+    restart: always
+    volumes:
+      - ./nginx/minimal-site.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    labels:
+      kompose.service.type: nodeport
+      kompose.service.expose: true
+      kompose.service.expose.ingress-class-name: "nginx"

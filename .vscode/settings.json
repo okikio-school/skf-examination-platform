@@ -1,0 +1,12 @@
+{
+  "deno.enablePaths": [
+    "./packages/workers",
+    "./packages/shared/config.ts"
+  ],
+  "deno.config": "./packages/workers/deno.jsonc",
+  "yaml.schemas": {
+    "Kubernetes": [
+      "deploy*.yaml"
+    ],
+  },
+}

@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "rascal": "npm:rascal",
+    "@skf/shared/config.ts": "../shared/config.ts"
+  }
+}
