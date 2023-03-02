@@ -14,6 +14,7 @@
     "start": "sh ./scripts/kubernetes-sh.sh",
     "start:workers": "pnpm --filter=workers exec -- deno task kubernetes",
     "start:astro": "pnpm --filter=astro start:server",
+    "start:rabbitmq": "docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.11-management",
     "build:astro": "pnpm --filter=astro build",
     "dev:astro": "pnpm --filter=astro dev",
     "docker": "pnpm docker:astro && pnpm docker:workers; kind load docker-image workers:skf astro:skf",
