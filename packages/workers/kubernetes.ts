@@ -39,7 +39,7 @@ import { config } from '@skf/shared/config.ts';
 import rascal from 'rascal';
 const { createBrokerAsPromised } = rascal;
 
-const env = await dotenv();
+const env = await dotenv({export: true});
 
 function getEnv(name: string) { 
   return env[name] ?? Deno.env.get(name);
