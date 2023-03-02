@@ -95,6 +95,8 @@ pnpm dev:astro
 
 Step 4. Run `workers` in a separate terminal (development) (you may need to wait till `rabbitmq` is ready)
 
+> Note: you'll need a `.env` in `./packages/astro/.env` with `PUBLIC_SUPABASE_API_KEY=your_api_key`
+
 ```sh
 pnpm start:workers
 ```
