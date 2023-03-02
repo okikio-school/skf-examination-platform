@@ -406,7 +406,9 @@
     "https://deno.land/x/socket_fetch@v0.1/client.ts": "b13061e728ec717cca0e3a1fe9db7b7a1066bd6dd14e903dcdd7c88fccfa3a86",
     "https://deno.land/x/socket_fetch@v0.1/dialers.ts": "f184deb1834dd0d69ecebb4b0e85e98d9df6844842b91396fa8daa4a63ade1cc",
     "https://deno.land/x/socket_fetch@v0.1/mod.ts": "02492a34b78a538233a20f1b19dcdf29ddaa7f9ec0ee2ae09d6ca3dc64fe1d97",
-    "https://deno.land/x/socket_fetch@v0.1/perform-request.ts": "f75e2d5296ce3150e3de14574cab24ac64fd7876ae8736e8a1d7bdcee2c6c1c3"
+    "https://deno.land/x/socket_fetch@v0.1/perform-request.ts": "f75e2d5296ce3150e3de14574cab24ac64fd7876ae8736e8a1d7bdcee2c6c1c3",
+    "https://deno.land/x/stream_observables@v1.3/combiners/merge.ts": "84cc8873f9c42b72d29ba4dbca6f7d4579276d7e8467856ae6cd22f8ffa149ff",
+    "https://deno.land/x/stream_observables@v1.3/types.ts": "3933df0a0e584ff35a596157834eebf0bc2844d0b96bf3e4349e6fd3c4bd27a6"
   },
   "npm": {
     "specifiers": {

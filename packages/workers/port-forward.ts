@@ -1,8 +1,11 @@
-import { Reflector, KubeConfigRestClient, ClientProviderChain, KubectlRawRestClient, RequestOptions, JSONValue } from 'https://deno.land/x/kubernetes_client/mod.ts';
-import type { RestClient } from 'https://deno.land/x/kubernetes_client/mod.ts';
+import { Reflector, ClientProviderChain, KubectlRawRestClient, RequestOptions, JSONValue, JsonParsingTransformer, HttpMethods } from 'https://deno.land/x/kubernetes_client/mod.ts';
+import type { RestClient as DefaultRestClient } from 'https://deno.land/x/kubernetes_client/mod.ts';
 import type { Service } from 'https://deno.land/x/kubernetes_apis/builtin/core@v1/structs.ts';
 import { CoreV1Api } from "https://deno.land/x/kubernetes_apis/builtin/core@v1/mod.ts";
 import { load as dotenv } from "https://deno.land/std/dotenv/mod.ts";
+import { ChannelStreams, KubeConfigRestClient } from "./via-kubeconfig.ts";
+
+import { merge } from 'https://deno.land/x/stream_observables@v1.3/combiners/merge.ts';
 
 const env = await dotenv();
 
@@ -19,21 +22,20 @@ export const DefaultClientProvider
     ['KubectlRaw', async () => new KubectlRawRestClient()],
   ]);
   
-  import { fetch as socketFetch } from "https://deno.land/x/socket_fetch@v0.1/mod.ts";
 
-  // const resp = await fetchUsing(dialer, "https://1.1.1.1/");
-  // console.log(await resp.text());
+// const resp = await fetchUsing(dialer, "https://1.1.1.1/");
+// console.log(await resp.text());
 
 /**
  * Trial-and-error approach for automatically deciding how to talk to Kubernetes.
  * You'll still need to set the correct permissions for where you are running.
  * You can probably be more specific and secure with app-specific Deno.args flags.
  */
-export async function autoDetectClient(): Promise<RestClient> {
+export async function autoDetectClient(): Promise<DefaultRestClient> {
   return DefaultClientProvider.getClient();
 }
 
-const kubernetes = await autoDetectClient();
+const kubernetes = await autoDetectClient() as KubeConfigRestClient;
 console.log({
   kubernetes
 })
@@ -62,155 +64,7 @@ export async function getServiceExposedIP(deployment: string, user_id: string) {
       cause: e
     })
   }
-}
-
-async function performRequest(opts: RequestOptions): Promise<any> {
-  let path = opts.path || '/';
-  if (opts.querystring) {
-    path += `?${opts.querystring}`;
-  }
-
-  // if (isVerbose && path !== '/api?healthcheck') {
-  //   console.error(opts.method, path);
-  // }
-
-  const headers: Record<string, string> = {
-  };
-
-  // @ts-ignore
-  const ctx = kubernetes.ctx;
-  console.log({ kubernetes })
-  if (!ctx.cluster.server) throw new Error(`No server URL found in KubeConfig`);
-  const authHeader = await ctx.getAuthHeader();
-  if (authHeader) {
-    headers['Authorization'] = authHeader;
-  }
-
-  const accept = opts.accept ?? (opts.expectJson ? 'application/json' : undefined);
-  if (accept) headers['Accept'] = accept;
-
-  const contentType = opts.contentType ?? (opts.bodyJson ? 'application/json' : undefined);
-  if (contentType) headers['Content-Type'] = contentType;
-
-  let userCert = atob(ctx.user["client-certificate-data"] ?? '') || null;
-  let userKey = atob(ctx.user["client-key-data"] ?? '') || null;
-
-  if ((userKey && !userCert) || (!userKey && userCert)) throw new Error(
-    `Within the KubeConfig, client key and certificate must both be provided if either is provided.`);
-
-  let serverCert = atob(ctx.cluster["certificate-authority-data"] ?? '') || null;
-  let httpClient = (Deno as any).createHttpClient({
-    caCerts: serverCert ? [serverCert] : [],
-    certChain: userCert,
-    privateKey: userKey,
-    // proxy: { url: "http://localhost:8001" }
-  });
-
-  const url = new URL(path, ctx.cluster.server);
-  console.log({
-    url
-  })
-  url.protocol = url.protocol.replace("http", "ws")
-  const resp = await fetch(url, {
-    method: opts.method,
-    body: opts.bodyStream ?? opts.bodyRaw ?? JSON.stringify(opts.bodyJson),
-    redirect: 'error',
-    signal: opts.abortSignal,
-    client: httpClient,
-    headers: {
-      ...headers,
-      'X-Stream-Protocol-Version': 'portforward.k8s.io',
-      "User-Agent": "kubectl/v1.26.1 (linux/amd64) kubernetes/8f94681"
-    },
-  } as RequestInit);
-
-  type HttpError = Error & {
-    httpCode?: number;
-    status?: JSONValue;
-  }
-  
-  // If we got a fixed-length JSON body with an HTTP 4xx/5xx, we can assume it's an error
-  if (!resp.ok && resp.headers.get('content-type') == 'application/json' && resp.headers.get('content-length')) {
-    const bodyJson = await resp.json();
-    const error: HttpError = new Error(`Kubernetes returned HTTP ${resp.status} ${bodyJson.reason}: ${bodyJson.message}`);
-    error.httpCode = resp.status;
-    error.status = bodyJson;
-    throw error;
-  }
-
-  // if (opts.expectStream) {
-  //   if (!resp.body) return new ReadableStream();
-  //   if (opts.expectJson) {
-  //     return resp.body
-  //       .pipeThrough(new TextDecoderStream('utf-8'))
-  //       .pipeThrough(new TextLineStream())
-  //       .pipeThrough(new JsonParsingTransformer());
-  //   } else {
-  //     return resp.body;
-  //   }
-
-  // } else
-  if (opts.expectJson) {
-    return resp.json();
-
-  } else {
-    return new Uint8Array(await resp.arrayBuffer());
-  }
-}
-
-
-async function connectPostPodPortforward(namespace: string, name: string, opts: {
-  ports?: number;
-  abortSignal?: AbortSignal;
-} = {}) {
-  const query = new URLSearchParams;
-  if (opts["ports"] != null) query.append("ports", String(opts["ports"]));
-  const resp = await performRequest({
-    method: "POST",
-    path: `/api/v1/namespaces/${namespace}/pods/${name}/portforward`,
-    expectJson: true,
-    querystring: query,
-    abortSignal: opts.abortSignal,
-  });
-}
-
-export async function portForward(deployment: string, user_id: string, ports: number) {
-  try {
-    const response = coreApi.namespace(user_id);
-    const podList = await response.getPodList();
-    console.log({ metadata: podList.items.map(x => x.metadata) });
-
-    let runLoop = true
-    while (runLoop) {
-      const test = await waitGetCompletedPodPhase(deployment, user_id)
-      if (test === "Running") {
-        console.log("Pod has started and is running")
-        runLoop = false;
-        break
-      }
-    }
-
-    for (const pod of podList.items) {
-      const resource_name = pod.metadata?.name;
-      const label = pod.metadata?.labels?.app;
-      if (
-        typeof label == "string" &&
-        typeof resource_name == "string" &&
-        label.includes(deployment)
-      ) {
-        console.log({ resource_name, user_id })
-        
-        return await connectPostPodPortforward(user_id, resource_name, {
-          ports
-        })
-      }
-    }
-  } catch (e) {
-    throw new Error('Failed to deploy, error port forward!', {
-      cause: e
-    })
-  }
-}
+} 
 
 export async function getHostPortFromResponse(type: "node-port", response: Service): Promise<number>;
 export async function getHostPortFromResponse(type: "target-port", response: Service): Promise<number | string>;
@@ -303,12 +157,129 @@ export async function waitGetCompletedPodPhase(release: string, user_id: string)
   });
 }
 
+
+export interface RestClient {
+  performRequest(opts: RequestOptions & {expectChannel: string[]}): Promise<ChannelStreams>;
+  performRequest(opts: RequestOptions & {expectStream: true; expectJson: true}): Promise<ReadableStream<JSONValue>>;
+  performRequest(opts: RequestOptions & {expectStream: true}): Promise<ReadableStream<Uint8Array>>;
+  performRequest(opts: RequestOptions & {expectJson: true}): Promise<JSONValue>;
+  performRequest(opts: RequestOptions): Promise<Uint8Array>;
+  defaultNamespace?: string;
+}
+  
+async function tunnelPodPortforward(client: RestClient, namespace: string, podName: string, opts: {
+  ports: number[];
+  abortSignal?: AbortSignal;
+}) {
+  const query = new URLSearchParams;
+  for (const port of opts.ports) {
+    query.append("ports", String(port));
+  }
+
+  const {readable, writable} = await client.performRequest({
+    method: "GET",
+    path: `/api/v1/namespaces/${namespace}/pods/${podName}/portforward`,
+    expectChannel: ['v4.channel.k8s.io'],
+    querystring: query,
+    abortSignal: opts.abortSignal,
+  });
+  // const outWriter = writable.getWriter();
+
+
+
+  const recvStreams = new Array<ReadableStreamDefaultController<Uint8Array>>();
+  const transmitStreams = new Array<ReadableStream<[number, Uint8Array]>>();
+  const portStreams = opts.ports.map((port, idx) => {
+    const dataIdx = idx*2;
+    const errorIdx = idx*2 + 1;
+    // const dataWritable = new WritableStream<Uint8Array>({
+    //   write: (data) => outWriter.write([dataIdx, data]),
+    // });
+    const outputTransformer = new TransformStream<Uint8Array, [number, Uint8Array]>({
+      transform(data, ctlr) {
+        ctlr.enqueue([dataIdx, data]);
+      },
+    });
+    transmitStreams.push(outputTransformer.readable);
+    let firstOne = true;
+    const dataReadable = new ReadableStream<Uint8Array>({
+      start(ctlr) {
+        recvStreams[dataIdx] = ctlr;
+      },
+    });
+    const errorReadable = new ReadableStream<Uint8Array>({
+      start(ctlr) {
+        recvStreams[errorIdx] = ctlr;
+      },
+    });
+    return {
+      port,
+      dataWritable: outputTransformer.writable,
+      dataReadable,
+      errorReadable,
+    };
+  });
+
+  // TODO: await?
+  merge(...transmitStreams).pipeTo(writable);
+
+  (async function () {
+    const hasPort = new Array<boolean>(opts.ports.length * 2);
+    for await (const [channel, data] of readable) {
+      const subIdx = channel % 2;
+      const portIdx = (channel - subIdx) / 2;
+      if (portIdx >= opts.ports.length) throw new Error(
+        `Received data for unregged port`);
+      if (hasPort[channel]) {
+        recvStreams[channel]?.enqueue(data);
+      } else {
+        hasPort[channel] = true;
+        const port = new DataView(data.buffer).getUint16(0, true);
+        console.log([opts.ports[portIdx], port]);
+        if (data.length > 2) {
+          recvStreams[channel]?.enqueue(data.slice(2));
+        }
+      }
+    }
+  })().then(() => {
+    recvStreams.forEach(x => x.close());
+  }, err => {
+    recvStreams.forEach(x => x.error(err));
+  });
+
+  return portStreams;
+}
+
+// const portTunnels = await tunnelPodPortforward(kubernetes, Deno.args[0], Deno.args[1], {ports: [80, 81]});
+// console.log({forwards})
+
+// const badPort = portTunnels.find(x => x.port == 81)!;
+// for await (const x of badPort.errorReadable) {
+//   console.log('bad', new TextDecoder().decode(x));
+//   break;
+// }
+// console.log('done bad');
+
+
 try {
   const rpc_body = "lfi:okikioluwaojo-0aac415c-74be-4487-a112-6dc7337ce8cc";
   const [deployment, user_id] = split(rpc_body);
   const response = await getServiceExposedIP(deployment, user_id)
   const targetPorts = await getHostPortFromResponse("target-port", response)
-  await portForward(deployment, user_id, Number(targetPorts))
+
+const portTunnels = await tunnelPodPortforward(kubernetes, user_id, deployment, {ports: [Number(targetPorts)]});
+  // await portForward(deployment, user_id, Number(targetPorts))
+
+const goodPort = portTunnels.find(x => x.port == Number(targetPorts))!;
+await goodPort.dataWritable.getWriter().write(new TextEncoder().encode(
+`GET / HTTP/1.1
+Connection: close
+Host: asdf.com\n\n`));
+console.log('done good write');
+for await (const x of goodPort.dataReadable) {
+  console.log('good', new TextDecoder().decode(x));
+}
+console.log('done good');
 } catch (err) {
   console.error(err);
 }

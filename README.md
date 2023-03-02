@@ -95,6 +95,8 @@ pnpm dev:astro
 
 Step 4. Run `workers` in a separate terminal (development) (you may need to wait till `rabbitmq` is ready)
 
+> Note: you'll need a `.env` in `./packages/astro/.env` with `PUBLIC_SUPABASE_API_KEY=your_api_key`
+
 ```sh
 pnpm start:workers
 ```
@@ -123,11 +125,11 @@ All commands are run from the root of the project, from a terminal:
 | `pnpm kind:create`                       | Create's `kind` cluster for production and sets up the kubernetes config file (`./k8s/kubeconf`) the `workers` docker container needs  |
 | `pnpm dev:kind:create`                   | Create's `kind` cluster for development and sets up the kubernetes config file (`./k8s/kubeconf`) the `workers` docker container needs |
 | `pnpm start`                             | Start the `astro`, `workers`, and `rabbitmq` docker containers in kubernetes                                                           |
-| `pnpm --filter=workers -- deno ...`      | Run CLI commands like `deno run -A ./hello.ts`, `deno lint`, etc..                                                                     |
-| `pnpm --filter=workers -- deno --help`   | Get help using Deno                                                                                                                    |
-| `pnpm --filter=workers -- deno fmt`      | Formats code for the Deno workers                                                                                                      |
-| `pnpm --filter=astro -- deno lint`       | Lints code for the Deno workers                                                                                                        |
-| `pnpm --filter=astro -- deno task hello` | Runs the `hello` task script in the [./packages/workers/deno.jsonc](./packages/workers/deno.jsonc)                                     |
+| `pnpm --filter=workers exec -- deno ...`      | Run CLI commands like `deno run -A ./hello.ts`, `deno lint`, etc..                                                                     |
+| `pnpm --filter=workers exec -- deno --help`   | Get help using Deno                                                                                                                    |
+| `pnpm --filter=workers exec -- deno fmt`      | Formats code for the Deno workers                                                                                                      |
+| `pnpm --filter=workers exec -- deno lint`       | Lints code for the Deno workers                                                                                                        |
+| `pnpm --filter=workers exec -- deno task hello` | Runs the `hello` task script in the [./packages/workers/deno.jsonc](./packages/workers/deno.jsonc)                                     |
 
 ## FAQ
 ### Kind
