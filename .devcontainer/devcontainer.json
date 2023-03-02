@@ -28,7 +28,9 @@
 				"ms-kubernetes-tools.vscode-kubernetes-tools",
 				"redhat.vscode-yaml",
 				"yzhang.markdown-all-in-one",
-				"Gruntfuggly.todo-tree"
+				"Gruntfuggly.todo-tree",
+				"astro-build.astro-vscode",
+				"svelte.svelte-vscode"
 			]
 		}
 	}
