@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 kind delete cluster
-kind create cluster
+kind create cluster --wait 5m 
 kind get clusters 
 kubectl cluster-info --context kind-kind
 
