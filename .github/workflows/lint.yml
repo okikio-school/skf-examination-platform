@@ -43,4 +43,4 @@ jobs:
         run: pnpm install
 
       - name: Lint
-        run: pnpm lint
+        run: pnpm --filter=astro lint

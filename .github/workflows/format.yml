@@ -43,4 +43,4 @@ jobs:
         run: pnpm install
 
       - name: Check format
-        run: pnpm check:format
+        run: pnpm --filter=astro check:format
