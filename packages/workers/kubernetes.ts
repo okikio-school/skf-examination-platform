@@ -31,7 +31,7 @@ import {
   fromDeploymentSpec, toDeploymentSpec,
   fromDeployment, toDeployment
 } from 'https://deno.land/x/kubernetes_apis/builtin/apps@v1/mod.ts';
-import { load as dotenv } from "https://deno.land/std/dotenv/mod.ts";
+import { load } from "https://deno.land/std@0.178.0/dotenv/mod.ts";
 
 import { config } from '@skf/shared/config.ts';
 
@@ -39,10 +39,10 @@ import { config } from '@skf/shared/config.ts';
 import rascal from 'rascal';
 const { createBrokerAsPromised } = rascal;
 
-const env = await dotenv({export: true});
+await load({export: true});
 
 function getEnv(name: string) { 
-  return env[name] ?? Deno.env.get(name);
+  return Deno.env.get(name);
 }
 console.log({ host: getEnv("KUBERNETES_HOST"), HOME: getEnv("HOME"), envlist: Deno.env.toObject() })
 
