@@ -14,3 +14,5 @@ yq -i '
   .networking.mode = "host-bridge" 
 ' ./k8s/kubeconf
 
+touch ./packages/workers/.env
+echo "KUBECONFIG=$(realpath ./k8s/kubeconf)" >> ./packages/workers/.env
