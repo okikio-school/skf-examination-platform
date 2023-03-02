@@ -2,18 +2,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "node",
       "request": "launch",
-      "name": "Debug Deno",
+      "name": "Deno Debug",
+      "type": "node",
+      "program": "${workspaceFolder}/packages/workers/kubernetes.ts",
+      "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
-      "program": "${workspaceFolder}/src/workers/kubernetes.ts",
-      "runtimeArgs": [
-          "run",
-          // "--inspect-brk",
-          // "-A"
-      ],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
-    },
+      "runtimeArgs": ["run", "--inspect-wait", "--allow-all", "--unstable", "--allow-read=$HOME/.kube", "--allow-net", "--allow-env", "-Ldebug"],
+      "attachSimplePort": 9229
+    }
   ]
 }

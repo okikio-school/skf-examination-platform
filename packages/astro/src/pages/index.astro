@@ -8,5 +8,10 @@ const isLoggedin = await checkSession(Astro);
 ---
 
 <BaseLayout title="SKF" isLoggedin={isLoggedin}>
+  <div class="wrapper">
+    <a href="/api/labs/deployments/1" target="_blank">WIP: Deploy Lab 1</a>
+    <br />
+    <a href="/api/labs/deployments/2" target="_blank">WIP: Deploy Lab 2</a>
+  </div>
   <Home certificates={certificates} />
 </BaseLayout>
