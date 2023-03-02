@@ -93,6 +93,7 @@ export function emailUserName(email?: string) {
   }
 }
 
+// TODO: replace sanitization with Zod
 export function alphaNumeric(value: string) {
   const match = value.match(/[^ \w_\.\-\\|\\'\",\+\(\)\/\:@\?\&\=\%\!\#\^\;]/g);
   if (match) {
@@ -102,6 +103,7 @@ export function alphaNumeric(value: string) {
   return true;
 }
 
+// TODO: replace sanitization with Zod
 export function isInteger(value: number) {
   if (!Number.isInteger(value)) {
     throw new Error("Validation Error. Instance id supplied is not an integer.")
