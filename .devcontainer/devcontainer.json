@@ -12,7 +12,11 @@
 			"minikube": "none"
 		},
 		"ghcr.io/mpriscella/features/kind:1": {},
-		"ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {}
+		"ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {
+      "jqVersion": "none",
+      "yqVersion": "latest",
+      "gojqVersion": "none"
+    }
 	},
 	"customizations": {
 		"vscode": {
@@ -24,7 +28,9 @@
 				"ms-kubernetes-tools.vscode-kubernetes-tools",
 				"redhat.vscode-yaml",
 				"yzhang.markdown-all-in-one",
-				"Gruntfuggly.todo-tree"
+				"Gruntfuggly.todo-tree",
+				"astro-build.astro-vscode",
+				"svelte.svelte-vscode"
 			]
 		}
 	}
