@@ -16,6 +16,7 @@
     "format": "prettier --write .",
     "check:format": "prettier --check .",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.svelte,.astro",
+    "fix:lint": "eslint . --fix --ext .js,.jsx,.ts,.tsx,.svelte,.astro",
     "generate:json": "tsx ./src/scripts/fetchLabs.ts",
     "start:server": "node ./dist/server/entry.mjs",
     "update-types": "npx supabase gen types typescript --project-id \"ccsgfooankckfqpmcfyb\" > src/db/database.types.d.ts"
