@@ -73,6 +73,35 @@ Step 3. Start `kubernetes`
 pnpm start
 ```
 
+## Developing Locally
+
+Step 1. Create cluster (development)
+
+```sh
+pnpm dev:kind:create
+```
+
+Step 2. Run `rabbitmq` in a separate terminal
+
+```sh
+pnpm start:rabbitmq
+```
+
+Step 3. Run `astro` in a separate terminal (development)
+
+```sh
+pnpm dev:astro
+```
+
+Step 4. Run `workers` in a separate terminal (development) (you may need to wait till `rabbitmq` is ready)
+
+```sh
+pnpm start:workers
+```
+
+To test out if the `workers` are working, properly go to the Astro website at [`localhost:3000`](http://localhost:3000) and login.
+
+Once logged in, go to this URL [`localhost:3000/api/labs/deployments/1`](http://localhost:3000/api/labs/deployments/1) and you should see a message with a port number, if the response takes longer than 1 minute then the `workers` are not working properly, you need to kill all the development processes, you'll then have to restart the development process from Step 2 onward.
 
 ## 🧞 Commands
 

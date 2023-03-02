@@ -21,7 +21,7 @@
     "docker:workers": "docker build -t workers:skf -f ./packages/workers/Dockerfile --target prod . --no-cache",
     "docker:astro": "docker build -t astro:skf -f ./packages/astro/Dockerfile --target dev . --no-cache",
     "kind:create": "sh ./scripts/cluster-create-sh.sh",
-    "dev:kind:create": "sh ./scripts/cluster-create-sh.sh"
+    "dev:kind:create": "sh ./scripts/dev-cluster-create-sh.sh"
   },
   "devDependencies": {
     "typescript": "^4.9.5"
