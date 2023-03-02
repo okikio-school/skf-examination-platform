@@ -78,26 +78,27 @@ pnpm start
 
 All commands are run from the root of the project, from a terminal:
 
-| Command                                  | Action                                                                                                         |
-| :--------------------------------------- | :------------------------------------------------------------------------------------------------------------- |
-| `pnpm install`                           | Installs dependencies                                                                                          |
-| `pnpm dev:astro`                         | Starts local [Astro](https://astro.build/) dev server at `localhost:3000` for the frontend of the SKF website  |
-| `pnpm build:astro`                       | Build the production site to `./packages/astro/dist/`                                                          |
-| `pnpm start:astro`                       | Preview the site locally, before deploying                                                                     |
-| `pnpm --filter=astro astro ...`          | Run CLI commands like `astro add`, `astro check`                                                               |
-| `pnpm --filter=astro astro --help`       | Get help using the Astro CLI                                                                                   |
-| `pnpm --filter=astro format`             | Formats code for the Astro frontend                                                                            |
-| `pnpm --filter=astro fix:lint`           | Lints & Fixes code for the Astro frontend                                                                      |
-| `pnpm docker`                            | Builds the docker container for `astro` & `workers`                                                            |
-| `pnpm docker:astro`                      | Builds the docker container for only `astro`                                                                   |
-| `pnpm docker:workers`                    | Builds the docker container for only `workers`                                                                 |
-| `pnpm kind:create`                       | Create's `kind` and sets up the kubernetes config file (`./k8s/kubeconf`) the `workers` docker container needs |
-| `pnpm start`                             | Start the `astro`, `workers`, and `rabbitmq` docker containers in kubernetes                                   |
-| `pnpm --filter=workers -- deno ...`      | Run CLI commands like `deno run -A ./hello.ts`, `deno lint`, etc..                                             |
-| `pnpm --filter=workers -- deno --help`   | Get help using Deno                                                                                            |
-| `pnpm --filter=workers -- deno fmt`      | Formats code for the Deno workers                                                                              |
-| `pnpm --filter=astro -- deno lint`       | Lints code for the Deno workers                                                                                |
-| `pnpm --filter=astro -- deno task hello` | Runs the `hello` task script in the [./packages/workers/deno.jsonc](./packages/workers/deno.jsonc)             |
+| Command                                  | Action                                                                                                                                 |
+| :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm install`                           | Installs dependencies                                                                                                                  |
+| `pnpm dev:astro`                         | Starts local [Astro](https://astro.build/) dev server at `localhost:3000` for the frontend of the SKF website                          |
+| `pnpm build:astro`                       | Build the production site to `./packages/astro/dist/`                                                                                  |
+| `pnpm start:astro`                       | Preview the site locally, before deploying                                                                                             |
+| `pnpm --filter=astro astro ...`          | Run CLI commands like `astro add`, `astro check`                                                                                       |
+| `pnpm --filter=astro astro --help`       | Get help using the Astro CLI                                                                                                           |
+| `pnpm --filter=astro format`             | Formats code for the Astro frontend                                                                                                    |
+| `pnpm --filter=astro fix:lint`           | Lints & Fixes code for the Astro frontend                                                                                              |
+| `pnpm docker`                            | Builds the docker container for `astro` & `workers`                                                                                    |
+| `pnpm docker:astro`                      | Builds the docker container for only `astro`                                                                                           |
+| `pnpm docker:workers`                    | Builds the docker container for only `workers`                                                                                         |
+| `pnpm kind:create`                       | Create's `kind` cluster for production and sets up the kubernetes config file (`./k8s/kubeconf`) the `workers` docker container needs  |
+| `pnpm dev:kind:create`                   | Create's `kind` cluster for development and sets up the kubernetes config file (`./k8s/kubeconf`) the `workers` docker container needs |
+| `pnpm start`                             | Start the `astro`, `workers`, and `rabbitmq` docker containers in kubernetes                                                           |
+| `pnpm --filter=workers -- deno ...`      | Run CLI commands like `deno run -A ./hello.ts`, `deno lint`, etc..                                                                     |
+| `pnpm --filter=workers -- deno --help`   | Get help using Deno                                                                                                                    |
+| `pnpm --filter=workers -- deno fmt`      | Formats code for the Deno workers                                                                                                      |
+| `pnpm --filter=astro -- deno lint`       | Lints code for the Deno workers                                                                                                        |
+| `pnpm --filter=astro -- deno task hello` | Runs the `hello` task script in the [./packages/workers/deno.jsonc](./packages/workers/deno.jsonc)                                     |
 
 ## FAQ
 ### Kind
