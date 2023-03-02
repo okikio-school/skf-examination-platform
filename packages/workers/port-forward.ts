@@ -2,15 +2,16 @@ import { Reflector, ClientProviderChain, KubectlRawRestClient, RequestOptions, J
 import type { RestClient as DefaultRestClient } from 'https://deno.land/x/kubernetes_client/mod.ts';
 import type { Service } from 'https://deno.land/x/kubernetes_apis/builtin/core@v1/structs.ts';
 import { CoreV1Api } from "https://deno.land/x/kubernetes_apis/builtin/core@v1/mod.ts";
-import { load as dotenv } from "https://deno.land/std/dotenv/mod.ts";
+
+import { load } from "https://deno.land/std/dotenv/mod.ts";
 import { ChannelStreams, KubeConfigRestClient } from "./via-kubeconfig.ts";
 
 import { merge } from 'https://deno.land/x/stream_observables@v1.3/combiners/merge.ts';
 
-const env = await dotenv();
+await load({export:true})
 
 function getEnv(name: string) { 
-  return env[name] ?? Deno.env.get(name);
+  return Deno.env.get(name);
 }
 console.log({ host: getEnv("KUBERNETES_HOST"), HOME: getEnv("HOME"), envlist: Deno.env.toObject() })
 
