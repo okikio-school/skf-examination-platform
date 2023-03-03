@@ -165,6 +165,7 @@ export class KubeConfigRestClient implements RestClient {
 
     if (!this.ctx.cluster.server) throw new Error(`No server URL found in KubeConfig`);
     const authHeader = await this.ctx.getAuthHeader();
+    console.log(authHeader )
     if (authHeader) {
       headers['Authorization'] = authHeader;
     }
@@ -172,7 +173,7 @@ export class KubeConfigRestClient implements RestClient {
     const fullUrl = new URL(path, this.ctx.cluster.server);
 
     // Alternate request path for opening WebSockets
-    if (opts.expectChannel) {
+    if (opts.expectChannel) {      
       const subprotocols = [...opts.expectChannel];
       if (authHeader?.startsWith('Bearer ')) {
         const token = Base64EncodeUrl(authHeader.split(' ')[1]);
@@ -180,6 +181,8 @@ export class KubeConfigRestClient implements RestClient {
       }
 
       fullUrl.protocol = fullUrl.protocol.replace(/^http/, 'ws');
+
+      console.log(0, 0, fullUrl)
       const ws = new WebSocket(fullUrl.toString(), subprotocols);
       return await wrapWebSocket(ws, opts.abortSignal);
     }

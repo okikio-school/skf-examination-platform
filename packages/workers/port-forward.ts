@@ -8,20 +8,19 @@ import { ChannelStreams, KubeConfigRestClient } from "./via-kubeconfig.ts";
 
 import { merge } from 'https://deno.land/x/stream_observables@v1.3/combiners/merge.ts';
 
-await load({export:true})
+const env = await load({export:true})
 
 function getEnv(name: string) { 
-  return Deno.env.get(name);
+  return env[name] || Deno.env.get(name);
 }
 console.log({ host: getEnv("KUBERNETES_HOST"), HOME: getEnv("HOME"), envlist: Deno.env.toObject() })
 
-export const DefaultClientProvider
-  = new ClientProviderChain([
-    ['KubeConfig', () => KubeConfigRestClient.readKubeConfig(getEnv("KUBECONFIG"))], // 
-    ['InCluster', () => KubeConfigRestClient.forInCluster()],
-    ['KubectlProxy', () => KubeConfigRestClient.forKubectlProxy()],
-    ['KubectlRaw', async () => new KubectlRawRestClient()],
-  ]);
+export const DefaultClientProvider = new ClientProviderChain([
+  ['KubeConfig', () => KubeConfigRestClient.readKubeConfig(getEnv("KUBECONFIG"))], // 
+  ['InCluster', () => KubeConfigRestClient.forInCluster()],
+  ['KubectlProxy', () => KubeConfigRestClient.forKubectlProxy()],
+  ['KubectlRaw', async () => new KubectlRawRestClient()],
+]);
   
 
 // const resp = await fetchUsing(dialer, "https://1.1.1.1/");
@@ -260,6 +259,46 @@ async function tunnelPodPortforward(client: RestClient, namespace: string, podNa
 //   break;
 // }
 // console.log('done bad');
+
+
+
+
+// export async function portForward(deployment: string, user_id: string, ports: number) {
+//   try {
+//     const response = coreApi.namespace(user_id);
+//     const podList = await response.getPodList();
+//     console.log({ metadata: podList.items.map(x => x.metadata) });
+
+//     let runLoop = true
+//     while (runLoop) {
+//       const test = await waitGetCompletedPodPhase(deployment, user_id)
+//       if (test === "Running") {
+//         console.log("Pod has started and is running")
+//         runLoop = false;
+//         break
+//       }
+//     }
+
+//     for (const pod of podList.items) {
+//       const resource_name = pod.metadata?.name;
+//       const label = pod.metadata?.labels?.app;
+//       if (
+//         typeof label == "string" &&
+//         typeof resource_name == "string" &&
+//         label.includes(deployment)
+//       ) {
+//         console.log({ resource_name, user_id })
+//         return await response.connectPostPodPortforward(resource_name, {
+//           ports
+//         })
+//       }
+//     }
+//   } catch (e) {
+//     throw new Error('Failed to deploy, error port forward!', {
+//       cause: e
+//     })
+//   }
+// }
 
 
 try {
